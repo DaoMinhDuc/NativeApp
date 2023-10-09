@@ -7,29 +7,42 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post('http://localhost:8080/api/auth/login', {
-        email: email,
-        password: password,
-      });
+  // const handleLogin = async () => {
+    
+  //   try {
+  //     const response = await axios.post('http://localhost:8080/api/auth/login', {
+  //       email: email,
+  //       password: password,
+  //     });
+  
+  //     if (response.status === 200) {
+  //       // Đăng nhập thành công
+  //       // Lưu trạng thái đăng nhập vào AsyncStorage
+  //       await AsyncStorage.setItem('isLoggedIn', 'true');
+  
+  //       // Sau khi lưu trạng thái đăng nhập, bạn có thể điều hướng người dùng đến trang HomeScreen
+  //       navigation.navigate('HomeTabs');
+  //     } else {
+  //       // Đăng nhập không thành công
+  //       if (response.status === 403) {
+  //         // Xử lý lỗi 403: Tài khoản bị cấm truy cập
+  //         alert('Tài khoản của bạn bị cấm truy cập. Vui lòng kiểm tra lại tài khoản và mật khẩu.');
+  //       } else {
+  //         // Xử lý các lỗi khác
+  //         alert('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập.');
+  //       }
+  //     }
+  //   } catch (error) {
+  //     // Xử lý lỗi khi gửi yêu cầu đăng nhập đến API
+  //     console.error('Lỗi khi gửi yêu cầu đăng nhập:', error);
+  //   }
+  // };
 
-      if (response.status === 200) {
-        // Đăng nhập thành công
-        // Lưu trạng thái đăng nhập vào AsyncStorage
-        await AsyncStorage.setItem('isLoggedIn', 'true');
-
-        // Sau khi lưu trạng thái đăng nhập, bạn có thể điều hướng người dùng đến trang HomeScreen
-        navigation.navigate('HomeScreen');
-      } else {
-        // Đăng nhập không thành công
-        alert('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập.');
-      }
-    } catch (error) {
-      // Xử lý lỗi khi gửi yêu cầu đăng nhập đến API
-      console.error('Lỗi khi gửi yêu cầu đăng nhập:', error);
-    }
-  };
+  // Phần này dàn cho front test
+  const handleLogin = () => {
+    // Navigate to the "Login" screen
+    navigation.navigate('HomeTabs');
+  }; 
 
   return (
     <View style={{ flex: 1 }}>

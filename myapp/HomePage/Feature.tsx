@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import Navigator from './Navigator';
+import Navigator from '../Navigation/HomeTabNavigator';
 
 const Feature = () =>{
     return(

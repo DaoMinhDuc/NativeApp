@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 		width:275,
 	  },
 	text: {
-		fontFamily: 'SFProRounded', 
+		// fontFamily: 'SFProRounded', 
 		fontSize: 50,
 		fontWeight: '800',
 		lineHeight: 50, 

@@ -7,9 +7,36 @@ import FavoriteScreen from "../HomePage/FavoriteScreen";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 const Tab = createBottomTabNavigator();
 
-const Navigator = () => {
+const HomeTabNavigator = () => {
   return (
-    <Tab.Navigator initialRouteName="Home">
+    <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+  
+        if (route.name === 'Home') {
+          iconName = 'home';
+        } else if (route.name === 'Favorite') {
+          iconName = 'heart';
+        } else if (route.name === 'Profile') {
+          iconName = 'user';
+        } else if (route.name === 'History') {
+          iconName = 'history';
+        }
+  
+        return <Icon name={iconName} color={color} size={size} />;
+      },
+      tabBarLabel: () => null,
+      headerShown: false,
+    })}
+    tabBarOptions={{
+      activeTintColor: '#FA4A0C',
+      inactiveTintColor: '#ADADAF',
+      style: {
+        backgroundColor: '#FFFFFF',
+      },
+    }}
+  >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -55,4 +82,4 @@ const Navigator = () => {
   );
 };
 
-export default Navigator;
+export default HomeTabNavigator;
