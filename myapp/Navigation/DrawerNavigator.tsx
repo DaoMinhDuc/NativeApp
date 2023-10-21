@@ -2,7 +2,7 @@ import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '../HomePage/HomeScreen';
-import DrawerContent from '../HomePage/ListFood/DrawerContent';
+import DrawerContent from '../ListFood/DrawerContent';
 
 const Drawer = createDrawerNavigator();
 

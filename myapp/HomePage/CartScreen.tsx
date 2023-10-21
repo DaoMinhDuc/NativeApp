@@ -5,25 +5,38 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import { fetchCartItems, deleteCartItem } from '../service/cart';
 const CartScreen = () => {
   const [foodData, setFoodData] = useState([]);
   const [isSwiped, setIsSwiped] = useState([]); // Sử dụng một mảng state
   const navigation = useNavigation();
   
   useEffect(() => {
-    // Lấy dữ liệu từ API và thêm thuộc tính số lượng
-    axios.get('https://6511ac49b8c6ce52b394e02a.mockapi.io/test/food')
-      .then((response) => {
-        const foodWithQuantity = response.data.map((food) => ({
+    const fetchData = async () => {
+      try {
+        const response = await fetchCartItems(); // Sử dụng hàm fetchCartItems từ cartApi
+        const foodWithQuantity = response.map((food) => ({
           ...food,
-          quantity: 0, // Khởi tạo số lượng mặc định là 0
+          quantity: 1,
         }));
         setFoodData(foodWithQuantity);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Lỗi khi lấy dữ liệu từ API: ', error);
-      });
+      }
+    };
+    fetchData();
   }, []);
+
+  const deleteItem = (id) => {
+    try {
+      deleteCartItem(id); // Sử dụng hàm deleteCartItem từ cartApi
+      const updatedFoodData = foodData.filter((food) => food.id !== id);
+      setFoodData(updatedFoodData);
+    } catch (error) {
+      console.error('Lỗi khi xóa dữ liệu từ API: ', error);
+    }
+  };
+
   const increaseQuantity = (index) => {
     const updatedFoodData = [...foodData];
     updatedFoodData[index].quantity += 1;
@@ -52,7 +65,7 @@ const CartScreen = () => {
         </View>
           <View style={styles.iconContainer}>
             <TouchableOpacity
-              onPress={() => handleSwipeRight(index)}
+              onPress={() => deleteItem(item.id)}
               style={{ backgroundColor: 'red', borderRadius: 30, padding: 10}}
             >
               <Icon name="trash-can-outline" size={25} color="white" />
@@ -134,10 +147,10 @@ const CartScreen = () => {
         <TouchableOpacity
           style={styles.addToCartButton}
           onPress={() => {
-            // Xử lý khi nhấn vào nút Add to cart
+            navigation.navigate('CheckOut'); // Chuyển đến trang CheckOut khi nút "Complete order" được nhấn
           }}
         >
-          <Text style={styles.addToCartText}>Add to Cart</Text>
+          <Text style={styles.addToCartText}>Complete order</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -179,11 +192,12 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     paddingHorizontal: 16,
-    width: '80%',
+    width: 300,
   },
   foodName: {
     fontSize: 18,
     fontWeight: 'bold',
+   width: 300,
   },
   foodPrice: {
     fontSize: 16,

@@ -10,29 +10,15 @@ import HistoryScreen from "../HomePage/HistoryScreen";
 import FavoriteScreen from "../HomePage/FavoriteScreen";
 import CartScreen from "../HomePage/CartScreen"
 import HomeTabNavigator from "../Navigation/HomeTabNavigator";
-import SearchScreen from "../HomePage/ListFood/SearchScreen";
+import SearchScreen from "../ListFood/SearchScreen";
 import DrawerNavigator from "./DrawerNavigator";
-import DrawerContent from '../HomePage/ListFood/DrawerContent';
-import DetailScreen from "../HomePage/ListFood/DetailScreen";
+import DrawerContent from '../ListFood/DrawerContent';
+import DetailScreen from "../ListFood/DetailScreen";
+import CheckOutScreen from "../HomePage/CheckOutScreen";
+import PaymentScreen from "../HomePage/PaymentScreen";
 
 
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  SignUp: undefined;
-  HomeTabs: undefined;
-  Cart: undefined;
-  Home: undefined;
-  Favorite: undefined;
-  Profile: undefined;
-  History: undefined;
-  Search: undefined;
-  Sidebar: undefined;
-  Detail: undefined;
-};
-
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
 
 const AppNavigator = () => {
@@ -47,6 +33,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="Detail" component={DetailScreen} />
         <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
+        <Stack.Screen name="CheckOut" component={CheckOutScreen} />
+        <Stack.Screen name="Payment" component={PaymentScreen} />
         {/* <Stack.Screen name="Sidebar" component={DrawerNavigator} /> */}
       </Stack.Navigator>
     </NavigationContainer>

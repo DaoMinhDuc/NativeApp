@@ -4,28 +4,43 @@ import { AppBar, HStack, IconButton, Stack, TextInput } from "@react-native-mate
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { getFoodDetail } from '../service/detail'; 
+import { addToCart } from '../service/cart';
 const DetailScreen: React.FC = () => {
-   
+  const navigation = useNavigation();
+  const route = useRoute();
+  const  { foodId }  = route.params;
     const [foodData, setFoodData] = useState({
         name: '',
         price: '',
         description: '',
         imageUrl: '',
       });
+      useEffect(() => {
+        // Lấy dữ liệu từ API
+        getFoodDetail(foodId)
+          .then((data) => {
+            setFoodData(data);
+          })
+          .catch((error) => {
+            console.error('Lỗi khi lấy dữ liệu từ API: ', error.message);
+          });
+      }, []);
     
-  useEffect(() => {
-    // Lấy dữ liệu từ API
-    axios.get('https://6511ac49b8c6ce52b394e02a.mockapi.io/test/food/1')
-      .then((response) => {
-        const { name, price, description, imageUrl } = response.data;
-        setFoodData({ name, price, description, imageUrl });
-      })
-      .catch((error) => {
-        console.error('Lỗi khi lấy dữ liệu từ API: ', error);
-      });
-  }, []);
-
+      const handleAddToCart = () => {
+        // Truyền thông tin vào giỏ hàng
+        addToCart({
+          name: foodData.name,
+          price: foodData.price,
+        })
+          .then((response) => {
+            console.log('Đã thêm vào giỏ hàng: ', response);
+          })
+          .catch((error) => {
+            console.error('Lỗi khi thêm vào giỏ hàng: ', error.message);
+          });
+      };
   return (
     <View style={styles.container}>
        < View style={{flex: 2}}>
@@ -33,14 +48,14 @@ const DetailScreen: React.FC = () => {
             style={{ backgroundColor: 'transparent', elevation: 0, marginTop: 20 , }}
             leading={props => (
               <IconButton
-                icon={props => <Icon name="chevron-left" {...props} />}
+                icon={props => <Icon name="chevron-left" {...props} onPress={() => navigation.goBack()} />}
                 color="#000"
                
               />
             )}
             trailing={props => (
               <IconButton
-                icon={props => <Icon name="heart" {...props} />}
+                icon={props => <Icon name="heart-outline" {...props} />}
                 color="#000"
               />
             )}
@@ -71,9 +86,7 @@ const DetailScreen: React.FC = () => {
       {/* Nút Add to cart */}
       <TouchableOpacity
         style={styles.addToCartButton}
-        onPress={() => {
-          // Xử lý khi nhấn vào nút Add to cart
-        }}
+        onPress={handleAddToCart}
       >
         <Text style={styles.addToCartText}>Add to Cart</Text>
       </TouchableOpacity>
@@ -147,4 +160,3 @@ height: 77,
       
       },
   });
-  
