@@ -15,18 +15,17 @@ const DetailScreen: React.FC = () => {
         name: '',
         price: '',
         description: '',
-        imageUrl: '',
+        avatarUrl: '',
       });
       useEffect(() => {
-        // Lấy dữ liệu từ API
         getFoodDetail(foodId)
           .then((data) => {
             setFoodData(data);
           })
           .catch((error) => {
-            console.error('Lỗi khi lấy dữ liệu từ API: ', error.message);
+            console.error('Error fetching food details: ', error);
           });
-      }, []);
+      }, [foodId]);
     
       const handleAddToCart = () => {
         // Truyền thông tin vào giỏ hàng
@@ -43,7 +42,7 @@ const DetailScreen: React.FC = () => {
       };
   return (
     <View style={styles.container}>
-       < View style={{flex: 2}}>
+       < View style={{flex: 1}}>
        <AppBar
             style={{ backgroundColor: 'transparent', elevation: 0, marginTop: 20 , }}
             leading={props => (
@@ -61,9 +60,9 @@ const DetailScreen: React.FC = () => {
             )}
           />
           </View>
-      <View style={{flex: 6}}>
+      <View style={{flex: 7}}>
    {/* Slide image */}
-   <Image source={{ uri: foodData.imageUrl }} style={{ width: '100%', height: 200 }} />
+   <Image source={{ uri: foodData.avatarUrl }} style={{ width: '100%', height: 300 }} />
 
 {/* Tên món ăn */}
 <Text style={styles.foodName}>{foodData.name}</Text>
@@ -73,8 +72,10 @@ const DetailScreen: React.FC = () => {
 
 {/* Mô tả */}
 <View style={{marginLeft: 40, marginTop: 30}}>
-<Text style={styles.BoldText}>Delivery info</Text>
+<Text style={styles.BoldText}>Thông tin mô tả</Text>
 <Text style={styles.description}>{foodData.description}</Text>
+<Text style={styles.BoldText}>Delivery info</Text>
+<Text style={styles.description}>Shipper sẽ giao đến tận nơi giúp bạn hoặc bạn có thể tới nhận hàng</Text>
 <Text style={styles.BoldText}>Return policy</Text>
 <Text style={styles.description}>All our foods are double checked before leaving our stores so by any case you found a broken food please contact our hotline immediately.</Text>
 </View>

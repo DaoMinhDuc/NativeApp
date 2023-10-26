@@ -8,29 +8,29 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    // // Thực hiện xử lý đăng nhập
-    // try {
-    //   // Gửi yêu cầu đăng nhập đến máy chủ với thông tin email và password
-    //   const response = await axios.post('YOUR_LOGIN_ENDPOINT', {
-    //     email: email,
-    //     password: password,
-    //   });
+    // Thực hiện xử lý đăng nhập
+    try {
+      // Gửi yêu cầu đăng nhập đến máy chủ với thông tin email và password
+      const response = await axios.post('YOUR_LOGIN_ENDPOINT', {
+        email: email,
+        password: password,
+      });
 
-    //   // Kiểm tra phản hồi từ máy chủ
-    //   if (response.data.success) {
-    //     // Lưu thông tin đăng nhập, ví dụ: token
-    //     await AsyncStorage.setItem('userToken', response.data.token);
+      // Kiểm tra phản hồi từ máy chủ
+      if (response.data.success) {
+        // Lưu thông tin đăng nhập, ví dụ: token
+        await AsyncStorage.setItem('userToken', response.data.token);
 
-    //     // Chuyển đến trang chính hoặc trang bạn muốn
-    //     navigation.navigate('Home'); 
-    //   } else {
-    //     Alert.alert('Đăng nhập không thành công', 'Vui lòng kiểm tra thông tin đăng nhập.');
-    //   }
-    // } catch (error) {
-    //   console.error('Lỗi đăng nhập:', error);
-    //   Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng nhập.');
-    // }
-    navigation.navigate('HomeTabs')
+        // Chuyển đến trang chính hoặc trang bạn muốn
+        navigation.navigate('Home'); 
+      } else {
+        Alert.alert('Đăng nhập không thành công', 'Vui lòng kiểm tra thông tin đăng nhập.');
+      }
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng nhập.');
+    }
+    // navigation.navigate('HomeTabs')
   };
 
   return (

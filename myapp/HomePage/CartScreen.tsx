@@ -5,7 +5,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import { fetchCartItems, deleteCartItem } from '../service/cart';
+import { getCartItems, removeFromCart } from '../service/cart';
 const CartScreen = () => {
   const [foodData, setFoodData] = useState([]);
   const [isSwiped, setIsSwiped] = useState([]); // Sử dụng một mảng state
@@ -14,7 +14,7 @@ const CartScreen = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchCartItems(); // Sử dụng hàm fetchCartItems từ cartApi
+        const response = await getCartItems(); // Sử dụng hàm fetchCartItems từ cartApi
         const foodWithQuantity = response.map((food) => ({
           ...food,
           quantity: 1,
@@ -29,7 +29,7 @@ const CartScreen = () => {
 
   const deleteItem = (id) => {
     try {
-      deleteCartItem(id); // Sử dụng hàm deleteCartItem từ cartApi
+      removeFromCart(id); // Sử dụng hàm deleteCartItem từ cartApi
       const updatedFoodData = foodData.filter((food) => food.id !== id);
       setFoodData(updatedFoodData);
     } catch (error) {

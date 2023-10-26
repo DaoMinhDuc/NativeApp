@@ -34,13 +34,4 @@ export const removeFromCart = async (foodId) => {
   }
 };
 
-// Hàm xóa toàn bộ giỏ hàng
-export const clearCart = async () => {
-  try {
-    await axios.delete(cartUrl);
-    console.log('Đã xóa toàn bộ giỏ hàng');
-  } catch (error) {
-    console.error('Lỗi khi xóa toàn bộ giỏ hàng:', error);
-    throw error;
-  }
-};
+// const cartUrl = 'https://6528e224931d71583df28880.mockapi.io/Cart';

@@ -1,31 +1,25 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, SafeAreaView, Animated, Button } from 'react-native';
-
+import { Text, View, StyleSheet, Image, TouchableOpacity, SafeAreaView, Animated, Button, FlatList, ScrollView } from 'react-native';
+import { Card } from 'react-native-paper';
 import { AppBar, HStack, IconButton, Stack, TextInput } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import FoodListProps from '../ListFood/FoodList';
-import HorizontalMenu from '../ListFood/MenuProps';
-import { getCategories } from '../service/category';
-
-
+import { getCategoryList, getCategoryItems } from '../service/category';
 
 
 const HomeScreen = ({ navigation }) => {
-  const [selectedCategory, setSelectedCategory] = useState('');
+ 
   const [showSidebar, setShowSidebar] = useState(false);
   const contentOffsetX = useRef(new Animated.Value(0)).current;
   const contentOffsetY = useRef(new Animated.Value(0)).current;
   const contentScale = useRef(new Animated.Value(1)).current;
-  const [categories, setCategories] = useState<string[]>([]);
 
-  // Khởi tạo state để lưu dữ liệu từ FoodListProps
-  const [foodData, setFoodData] = useState<any[]>([]);
-
-  // Tạo hàm callback để nhận dữ liệu từ FoodListProps
-  const onFoodDataLoaded = useCallback((data) => {
-    setFoodData(data);
-  }, []);
+ 
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const categories = ['food', 'drink', 'snack', 'sauce'];
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  
 
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
@@ -58,15 +52,29 @@ const HomeScreen = ({ navigation }) => {
   const goToCartScreen = () => {
     navigation.navigate('Cart');
   };
+
   useEffect(() => {
-    getCategories()
-      .then(data => {
-        setCategories(data);
+    // Get the list of categories
+    getCategoryList()
+      .then((categories) => {
+        categories(categories);
       })
-      .catch(error => {
-        console.error('Error fetching categories:', error);
-      });
+      .catch((error) => console.error(error));
   }, []);
+  
+  useEffect(() => {
+    if (selectedCategory) {
+      // Get items for the selected category
+      getCategoryItems(selectedCategory)
+        .then((items) => {
+          setFilteredData(items);
+        })
+        .catch((error) => console.error(error));
+    } else {
+      // If no category is selected, show all data
+      setFilteredData(data);
+    }
+  }, [selectedCategory, data]);
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View
@@ -116,14 +124,40 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           </View>
 
-          <View style={styles.list}>
-            
-          <HorizontalMenu items={categories} onItemClick={category => setSelectedCategory(category)} />
-            {selectedCategory && (
-              <FoodListProps category={selectedCategory} onFoodDataLoaded={onFoodDataLoaded} />
-            )}
-          </View>
-          
+        
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginLeft:70 , flex: 1 }}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            onPress={() => setSelectedCategory(category)}
+            style={{
+              padding: 8,
+            }}
+          >
+           <Text style={{ color: selectedCategory === category ? '#FA4A0C' : '#ADADAF', fontSize: 20, marginLeft: 20, }}>
+        {category}
+      </Text>
+          </TouchableOpacity>
+        ))}
+        </ScrollView>
+       <View style={styles.Cardcontainer}>
+      <FlatList
+      horizontal={true} // Sắp xếp ngang thay vì dọc
+        data={filteredData}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Detail', { foodId: item.id })}>
+          <Card  >
+           <Card.Cover source={{ uri: item.avatarUrl }} style={styles.cover} />
+            <Card.Content>
+              <Text style={styles.foodName}>{item.name}</Text>
+              <Text style={styles.foodPrice}>Price: {item.price} $</Text>
+            </Card.Content>
+          </Card>
+          </TouchableOpacity>
+        )}
+      />
+      </View>
         </View>
       </Animated.View>
       {showSidebar && (
@@ -163,6 +197,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    flexDirection: 'column', // Sắp xếp các phần theo cột
   },
   text: {
     fontFamily: 'SF Pro Rounded',
@@ -213,18 +248,53 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontWeight: 'bold',
   },
-  list:{
-    flex: 6,
-  height: 300,
+  list: {
+    flex: 1, // Chiếm 1 phần
   },
   deliciousFoodContainer: {
-    flex: 1, 
+    flex: 1, // Chiếm 2 phần
   },
   searchContainer: {
-    flex: 1, 
+    flex: 1, // Chiếm 1 phần
   },
   appBarContainer: {
-    flex: 2, // Chiếm 1 phần
+    flex: 1, // Chiếm 1 phần
+  },
+ 
+  Cardcontainer: {
+    flex: 4 , // Chiếm 4 phần
+   
+  },
+  card: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 40,
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    elevation: 3,
+    width: 200,
+    height: 250,
+    marginRight: 20,
+  },
+  cover: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+   
+  },
+  foodName: {
+    height: 90,
+    color: '#000',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  foodPrice: {
+    height: 30,
+    color: '#FA4A0C',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
 
