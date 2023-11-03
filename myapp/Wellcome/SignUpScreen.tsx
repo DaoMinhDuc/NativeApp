@@ -1,135 +1,141 @@
-import React from "react";
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import axios from 'axios';
-
-const schema = Yup.object().shape({
-    name: Yup.string().required("Tên là trường bắt buộc"),
-    phone: Yup.string()
-      .required("Số điện thoại là trường bắt buộc")
-      .matches(/^\d+$/, "Số điện thoại chỉ chứa số"),
-    email: Yup.string().required("Email là trường bắt buộc").email("Email không hợp lệ"),
-    password: Yup.string().required("Mật khẩu là trường bắt buộc").min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Xác nhận mật khẩu không khớp"),
-  });
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { registerApi } from "../service/user";
+import { validateEmail, validateFullName, validatePassword, validatePhoneNumber } from "../utils/validation";
+import { AppBar, IconButton } from "@react-native-material/core";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
 const SignUpScreen = ({ navigation }) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [nameError, setNameError] = useState(null);
+  const [phoneNumberError, setPhoneNumberError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(null);
 
-  
+  const handleRegister = () => {
+    setNameError(null);
+    setEmailError(null);
+    setPasswordError(null);
+    setConfirmPasswordError(null);
 
-  const onSubmit = async (data) => {
-    try {
-      // Gửi dữ liệu đăng ký đến API
-      const response = await axios.post('http://localhost:8080/api/auth/signup', data);
-  
-      // Kiểm tra phản hồi từ API
-      if (response.status === 200) {
-        // Đăng ký thành công, bạn có thể thực hiện các tác vụ khác ở đây nếu cần
-        console.log('Đăng ký thành công');
-        
-        // Sau khi đăng ký thành công, bạn có thể điều hướng về trang đăng nhập
-        navigation.navigate('Login');
-      } else {
-        // Xử lý lỗi hoặc thông báo lỗi đăng ký không thành công
-        console.error('Đăng ký không thành công:', response.data);
-      }
-    } catch (error) {
-      // Xử lý lỗi khi gửi yêu cầu đến API
-      console.error('Lỗi khi gửi yêu cầu đăng ký:', error);
+    const nameValidationResult = validateFullName(fullName);
+    if (nameValidationResult) {
+      setNameError(nameValidationResult);
+      return;
     }
+    const phoneValidationResult = validatePhoneNumber(phoneNumber);
+    if (phoneValidationResult) {
+      setPhoneNumberError(phoneValidationResult);
+      return;
+    }
+    const emailValidationResult = validateEmail(email);
+    if (emailValidationResult) {
+      setEmailError(emailValidationResult);
+      return;
+    }
+
+    const passwordValidationResult = validatePassword(password);
+    if (passwordValidationResult) {
+      setPasswordError(passwordValidationResult);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Password and confirm password do not match.");
+      return;
+    }
+
+    registerApi({
+      fullName,
+      email,
+      password,
+      phoneNumber
+    })
+      .then((response) => {
+        console.log("Registration response:", response.data);
+        Alert.alert(
+          "Registration Success",
+          "You have successfully registered."
+        );
+        navigation.navigate("Login");
+      })
+      .catch((error) => {
+        console.error("Registration error:", error);
+
+        Alert.alert(
+          "Registration Failed",
+          "An error occurred during registration. Please try again."
+        );
+      });
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
     <View style={styles.container}>
+        <AppBar 
+        style={{ 
+          backgroundColor: 'transparent',
+          elevation: 0,
+          marginTop: 20,
+        }}
+        title="Đăng kí"
+        tintColor="Black"
+        centerTitle={true}
+        leading={props => (
+          <IconButton icon={props => <Icon name="chevron-left" {...props} />} {...props} color="#000" onPress={() => navigation.goBack()} />
+        )}
+      />
       <Text style={styles.header}>Đăng ký</Text>
-      <Controller
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            placeholder="Tên"
-            style={styles.input}
-          />
-        )}
-        name="name"
+      <TextInput
+        placeholder="Tên"
+        style={styles.input}
+        value={fullName}
+        onChangeText={(text) => setFullName(text)}
       />
-      {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+      {nameError && <Text style={styles.errorText}>{nameError}</Text>}
+      <TextInput
+        placeholder="Số điện thoại"
+        style={styles.input}
+        value={phoneNumber}
+        onChangeText={(text) => setPhoneNumber(text)}
+      />
+      {phoneNumberError && <Text style={styles.errorText}>{phoneNumberError}</Text>}
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-      <Controller
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            placeholder="Số điện thoại"
-            style={styles.input}
-          />
-        )}
-        name="phone"
+      <TextInput
+        placeholder="Mật khẩu"
+        secureTextEntry
+        style={styles.input}
+        value={password}
+        onChangeText={(text) => setPassword(text)}
       />
-      {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
+      {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
-      <Controller
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            placeholder="Email"
-            style={styles.input}
-          />
-        )}
-        name="email"
+      <TextInput
+        placeholder="Xác nhận mật khẩu"
+        secureTextEntry
+        style={styles.input}
+        value={confirmPassword}
+        onChangeText={(text) => setConfirmPassword(text)}
       />
-      {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
-
-      <Controller
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            placeholder="Mật khẩu"
-            secureTextEntry
-            style={styles.input}
-          />
-        )}
-        name="password"
-      />
-      {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
-
-      <Controller
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            placeholder="Xác nhận mật khẩu"
-            secureTextEntry
-            style={styles.input}
-          />
-        )}
-        name="confirmPassword"
-      />
-      {errors.confirmPassword && (
-        <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+      {confirmPasswordError && (
+        <Text style={styles.errorText}>{confirmPasswordError}</Text>
       )}
 
-      <TouchableOpacity
-        onPress={handleSubmit(onSubmit)}
-        style={styles.button}
-      >
+      <TouchableOpacity onPress={handleRegister} style={styles.button}>
         <Text style={styles.buttonText}>Đăng ký</Text>
       </TouchableOpacity>
     </View>
-    </ScrollView>
   );
 };
 
@@ -155,17 +161,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   button: {
-    backgroundColor: '#FA4A0C',
+    backgroundColor: "#FA4A0C",
     borderRadius: 30,
-    width: '80%',
+    width: "80%",
     height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

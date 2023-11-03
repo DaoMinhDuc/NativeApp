@@ -1,6 +1,6 @@
 export interface RegisterBody { 
-    name: string
+    fullName: string
     email: string
     password: string
-    birthday:string
+    phoneNumber: string
 }

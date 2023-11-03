@@ -17,7 +17,7 @@ const HomeScreen = ({ navigation }) => {
  
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const categories = ['food', 'drink', 'snack', 'sauce'];
+  const categories = ['Food', 'Drink', 'Snack', 'Sauce'];
   const [selectedCategory, setSelectedCategory] = useState(null);
   
 
@@ -57,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
     // Get the list of categories
     getCategoryList()
       .then((categories) => {
-        categories(categories);
+        setData(categories);
       })
       .catch((error) => console.error(error));
   }, []);
@@ -299,3 +299,7 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+
+
+

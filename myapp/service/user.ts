@@ -1,13 +1,13 @@
 import axios from "axios";
-import { loginUrl, registerUrl, userUrl } from "./API";
+import { loginUrl, registerUrl, customerUrl } from "./api";
 import { RegisterBody } from "../interface/RegisterBody";
 import { LoginBody } from "../interface/LoginBody";
 
-export const registerApi = ({ name, email, password, birthday }: RegisterBody) => {
+export const registerApi = ({ fullName, email, password, phoneNumber }: RegisterBody) => {
   const registerRequest = axios({
     method: "POST",
     url: registerUrl,
-    data: { name, email, password, birthday },
+    data: { fullName, email, password, phoneNumber},
     headers: {
       "Content-Type": "application/json",
     },
@@ -29,7 +29,7 @@ export const loginApi = ({ email, password }: LoginBody) => {
 
 export const profileApi = async () => {
   try {
-    const response = await axios.get(userUrl + "profile");
+    const response = await axios.get(customerUrl + "profile");
     const data = await response.data;
     return data;
   } catch (error) {

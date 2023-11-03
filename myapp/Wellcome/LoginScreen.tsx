@@ -1,37 +1,45 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Alert } from "react-native";
-import React, { useState } from "react";
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from "react";
+import {
+  addTokenToAxios,
+  getAccessToken,
+  setAccessToken,
+} from "../service/token";
+import { loginApi } from "../service/user";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    // Thực hiện xử lý đăng nhập
+  const checkLoginStatus = async () => {
     try {
-      // Gửi yêu cầu đăng nhập đến máy chủ với thông tin email và password
-      const response = await axios.post('YOUR_LOGIN_ENDPOINT', {
-        email: email,
-        password: password,
-      });
-
-      // Kiểm tra phản hồi từ máy chủ
-      if (response.data.success) {
-        // Lưu thông tin đăng nhập, ví dụ: token
-        await AsyncStorage.setItem('userToken', response.data.token);
-
-        // Chuyển đến trang chính hoặc trang bạn muốn
-        navigation.navigate('Home'); 
-      } else {
-        Alert.alert('Đăng nhập không thành công', 'Vui lòng kiểm tra thông tin đăng nhập.');
+      const accessToken = await getAccessToken();
+      if (accessToken) {
+        addTokenToAxios(accessToken);
+        navigation.navigate("HomeTabs");
       }
     } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
-      Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng nhập.');
+      console.log(error);
     }
-    // navigation.navigate('HomeTabs')
   };
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const handleLogin = async () => {
+    // Gửi yêu cầu đăng nhập đến API
+    const response = await loginApi({ email, password });
+    const { data } = response.data;
+    const result = setAccessToken(response.data.token);
+    if (result) {
+      addTokenToAxios(response.data.token);
+      navigation.navigate("HomeTabs");
+    } else {
+      Alert.alert("Login Failed", "An error occurred during login. Please try again.");
+    }
+  };
+
 
   return (
     <View style={{ flex: 1 }}>
