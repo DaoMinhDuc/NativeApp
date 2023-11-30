@@ -1,45 +1,61 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { AppBar, HStack, IconButton, Stack, TextInput } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getFoodDetail } from '../service/detail'; 
+import { getDetailItem } from '../service/detail'; 
 import { addToCart } from '../service/cart';
-const DetailScreen: React.FC = () => {
-  const navigation = useNavigation();
+import { addToFavorites, removeFromFavorites } from '../favouriteSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../rootReducer';
+
+const DetailScreen= ({ navigation }) => {
+  const dispatch = useDispatch();
+  const favorites = useSelector((state: RootState) => state.favorites);
   const route = useRoute();
-  const  { foodId }  = route.params;
-    const [foodData, setFoodData] = useState({
-        name: '',
-        price: '',
-        description: '',
-        avatarUrl: '',
+  const  { itemId }  = route.params;
+  const [foodData, setFoodData] = useState({
+    itemId: '',
+    itemName: '',
+    cost: '',
+    description: '',
+    imageUrl: '',
+  });
+
+  useEffect(() => {
+    getDetailItem(itemId)
+      .then((data) => {
+        setFoodData(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching food details: ', error);
       });
-      useEffect(() => {
-        getFoodDetail(foodId)
-          .then((data) => {
-            setFoodData(data);
-          })
-          .catch((error) => {
-            console.error('Error fetching food details: ', error);
-          });
-      }, [foodId]);
-    
-      const handleAddToCart = () => {
-        // Truyền thông tin vào giỏ hàng
-        addToCart({
-          name: foodData.name,
-          price: foodData.price,
-        })
-          .then((response) => {
-            console.log('Đã thêm vào giỏ hàng: ', response);
-          })
-          .catch((error) => {
-            console.error('Lỗi khi thêm vào giỏ hàng: ', error.message);
-          });
-      };
+  }, [itemId]);
+
+  const handleAddToCart = () => {
+    addToCart({ itemId: foodData.itemId }) // Truyền itemId vào hàm addToCart
+      .then((response) => {
+        console.log('Đã thêm vào giỏ hàng: ', response);
+      })
+      .catch((error) => {
+        console.error('Lỗi khi thêm vào giỏ hàng: ', error.message);
+      });
+  };
+ 
+  const handleToggleFavorite = () => {
+    const isFavorite = favorites.some(item => item.itemId === foodData.itemId);
+
+    if (isFavorite) {
+      // Show alert or handle it as you want
+      alert('This item is already in favorites!');
+    } else {
+      // Dispatch action to add to favorites
+      dispatch(addToFavorites(foodData));
+    }
+  };
+
   return (
     <View style={styles.container}>
        < View style={{flex: 1}}>
@@ -56,40 +72,50 @@ const DetailScreen: React.FC = () => {
               <IconButton
                 icon={props => <Icon name="heart-outline" {...props} />}
                 color="#000"
+                onPress={handleToggleFavorite}
               />
             )}
           />
           </View>
       <View style={{flex: 7}}>
    {/* Slide image */}
-   <Image source={{ uri: foodData.avatarUrl }} style={{ width: '100%', height: 300 }} />
+   <Image source={{ uri: foodData.imageUrl }} style={{ width: '100%', height: 200 }} />
 
 {/* Tên món ăn */}
-<Text style={styles.foodName}>{foodData.name}</Text>
+<Text style={styles.foodName}>{foodData.itemName}</Text>
 
 {/* Giá */}
-<Text style={styles.price}>{foodData.price}</Text>
+<Text style={styles.price}>{foodData.cost}</Text>
 
 {/* Mô tả */}
-<View style={{marginLeft: 40, marginTop: 30}}>
+<ScrollView style={{marginLeft: 20, marginTop: 30}}>
 <Text style={styles.BoldText}>Thông tin mô tả</Text>
 <Text style={styles.description}>{foodData.description}</Text>
 <Text style={styles.BoldText}>Delivery info</Text>
 <Text style={styles.description}>Shipper sẽ giao đến tận nơi giúp bạn hoặc bạn có thể tới nhận hàng</Text>
 <Text style={styles.BoldText}>Return policy</Text>
 <Text style={styles.description}>All our foods are double checked before leaving our stores so by any case you found a broken food please contact our hotline immediately.</Text>
-</View>
+</ScrollView>
 
       </View>
 
      
-      <View style={{flex: 2, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flex: 2, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginVertical: 10}}>
       {/* Nút Add to cart */}
-      <TouchableOpacity
-        style={styles.addToCartButton}
+      <TouchableOpacity 
+        style={[styles.addToCartButton ,{ marginRight: 10 }]}
         onPress={handleAddToCart}
       >
-        <Text style={styles.addToCartText}>Add to Cart</Text>
+        <Text style={styles.addToCartText }>Add to Cart</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.addToCartButton}
+        onPress={() => {
+          handleAddToCart();
+          navigation.navigate('Cart');
+        }}
+      >
+        <Text style={styles.addToCartText}>Buy Now</Text>
       </TouchableOpacity>
     </View>
     </View>
@@ -113,7 +139,7 @@ const styles = StyleSheet.create({
     },
     image: {
       width: '100%',
-      height: 200,
+      height: 300,
     },
     foodName: {
         color: '#000',
@@ -135,15 +161,15 @@ const styles = StyleSheet.create({
       marginHorizontal: 20,
     },
     description: {
-      marginHorizontal: 20,
-      width: 297,
-height: 77,
+      marginHorizontal: 10,
+      width: 300,
+height: 90,
     },
     addToCartButton: {
       backgroundColor: '#FA4A0C',
       borderRadius: 30,
-      width: '80%',
-      height: 60,
+      width: '40%',
+      height: 50,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -152,6 +178,7 @@ height: 77,
       textAlign: 'center',
       fontSize: 18,
       fontWeight: 'bold',
+      
     },
     BoldText: {
         color: '#000',

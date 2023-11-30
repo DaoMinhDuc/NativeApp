@@ -89,7 +89,7 @@ const SignUpScreen = ({ navigation }) => {
           <IconButton icon={props => <Icon name="chevron-left" {...props} />} {...props} color="#000" onPress={() => navigation.goBack()} />
         )}
       />
-      <Text style={styles.header}>Đăng ký</Text>
+      {/* <Text style={styles.header}>Đăng ký</Text> */}
       <TextInput
         placeholder="Tên"
         style={styles.input}
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
-    marginBottom: 8,
+    marginBottom: 13,
     paddingHorizontal: 8,
   },
   errorText: {

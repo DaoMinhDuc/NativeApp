@@ -1,9 +1,9 @@
 // Interfaces.ts
 
 export interface UserProfile {
-    name: string;
+    fullName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
     address: string;
   }
   

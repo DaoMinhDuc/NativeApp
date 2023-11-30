@@ -1,8 +1,8 @@
 // src/interfaces/SearchResult.ts
 
 export interface Item {
-    id: number;
-    name: string;
+    itemId: number;
+    itemName: string;
     description: string;
   }
   

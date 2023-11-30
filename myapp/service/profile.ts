@@ -1,41 +1,28 @@
 // Services.ts
 import { UserProfile } from '../interface/Profile';
 import { customerUrl } from './api';
+import axios from 'axios';
 
 
-
-export const loadUserProfile = async (): Promise<UserProfile | null> => {
+export const loadUserProfile = async () => {
   try {
-    const response = await fetch(customerUrl); // Sử dụng URL từ api.ts
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    } else {
-      throw new Error('Failed to load user profile');
-    }
+    const response = await axios.get(customerUrl + 'profile');
+    const data = await response.data;
+    return data;
   } catch (error) {
-    console.error('Error loading user profile:', error);
-    return null;
+    console.error('Error fetching user profile:', error);
+    throw error;
   }
 };
 
-export const saveUserProfile = async (userData: UserProfile): Promise<boolean> => {
+export const saveUserProfile = async (profileData: UserProfile) => {
   try {
-    const response = await fetch(customerUrl, {
-      method: 'PUT', 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    if (response.ok) {
-      return true;
-    } else {
-      throw new Error('Failed to save user profile');
-    }
+    const response = await axios.put(customerUrl + 'update', profileData);
+    const success = response.data.success;
+    return success;
   } catch (error) {
     console.error('Error saving user profile:', error);
-    return false;
+    throw error;
   }
 };
 

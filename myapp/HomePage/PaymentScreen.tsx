@@ -37,7 +37,7 @@ const  PaymentScreen: React.FC = () => {
             <IconButton icon={props => <Icon name="chevron-left" {...props} />} {...props} color="#000" onPress={() => navigation.goBack()} />
           )}
         />
-        <Text style={{fontSize: 40, fontWeight: 'Bold', marginTop: 30, marginBottom: 30, marginLeft: 10}}>Payment</Text>
+        <Text style={{fontSize: 40, fontWeight: 'bold', marginTop: 30, marginBottom: 30, marginLeft: 10}}>Payment</Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Text style={styles.detailsLabel}>Address Details</Text>
         <TouchableOpacity onPress={handleAddressChange}>

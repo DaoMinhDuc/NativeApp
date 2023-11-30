@@ -3,10 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import { AppBar, IconButton } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { useNavigation } from '@react-navigation/native';
 
-const CheckOutScreen: React.FC = () => {
-    const navigation = useNavigation();
+
+const CheckOutScreen = ({ navigation }) => {
   const [address, setAddress] = useState({
     name: 'John Doe',
     address: '123 Main St',
@@ -37,7 +36,7 @@ const CheckOutScreen: React.FC = () => {
             <IconButton icon={props => <Icon name="chevron-left" {...props} />} {...props} color="#000" onPress={() => navigation.goBack()} />
           )}
         />
-        <Text style={{fontSize: 40, fontWeight: 'Bold', marginTop: 30, marginBottom: 30, marginLeft: 10}}>Delivery</Text>
+        <Text style={{fontSize: 40, fontWeight: 'bold', marginTop: 30, marginBottom: 30, marginLeft: 10}}>Delivery</Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Text style={styles.detailsLabel}>Address Details</Text>
         <TouchableOpacity onPress={handleAddressChange}>

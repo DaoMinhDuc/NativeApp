@@ -1,28 +1,20 @@
 import axios from 'axios';
-import { itemUrl } from './api';
 
-const categoryUrl = `${itemUrl}/all/category`;
+const apiUrl = 'https://food-app-api-2-e9fb9958f111.herokuapp.com/api/v1/item/all';
 
-export const getCategoryList = () => {
-  return axios
-    .get(categoryUrl)
-    .then((response) => response.data)
+export const getItemsByCategory = (category) => {
+  return axios.get(apiUrl)
+    .then((response) => {
+      const items = response.data;
+
+      if (category) {
+        return items.filter((item) => item.category === category);
+      }
+
+      return items;
+    })
     .catch((error) => {
-      console.error('Error fetching category list:', error);
+      console.error('Lỗi khi tải dữ liệu từ API: ', error);
       throw error;
     });
 };
-
-export const getCategoryItems = (category) => {
-  const url = `${categoryUrl}/${category}/item`;
-
-  return axios
-    .get(url)
-    .then((response) => response.data)
-    .catch((error) => {
-      console.error('Error fetching items for category:', error);
-      throw error;
-    });
-  };
-
-// const itemUrl = 'https://6511ac49b8c6ce52b394e02a.mockapi.io/test/food';

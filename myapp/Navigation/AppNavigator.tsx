@@ -11,18 +11,18 @@ import FavoriteScreen from "../HomePage/FavoriteScreen";
 import CartScreen from "../HomePage/CartScreen"
 import HomeTabNavigator from "../Navigation/HomeTabNavigator";
 import SearchScreen from "../ListFood/SearchScreen";
-import DrawerNavigator from "./DrawerNavigator";
-import DrawerContent from '../ListFood/DrawerContent';
 import DetailScreen from "../ListFood/DetailScreen";
 import CheckOutScreen from "../HomePage/CheckOutScreen";
 import PaymentScreen from "../HomePage/PaymentScreen";
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import DetailHistoryScreen from "../HomePage/DetailHistoryScreen";
 
 const Stack = createNativeStackNavigator();
 
 
 const AppNavigator = () => {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={Welcome} />
@@ -35,9 +35,11 @@ const AppNavigator = () => {
         <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
         <Stack.Screen name="CheckOut" component={CheckOutScreen} />
         <Stack.Screen name="Payment" component={PaymentScreen} />
+        <Stack.Screen name="DetailHistory" component={DetailHistoryScreen} />
         {/* <Stack.Screen name="Sidebar" component={DrawerNavigator} /> */}
       </Stack.Navigator>
     </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 

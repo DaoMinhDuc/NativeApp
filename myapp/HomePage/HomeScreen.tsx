@@ -1,49 +1,37 @@
-
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, SafeAreaView, Animated, Button, FlatList, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, Button, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { getItemsByCategory } from '../service/category'; 
 import { Card } from 'react-native-paper';
 import { AppBar, HStack, IconButton, Stack, TextInput } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { getCategoryList, getCategoryItems } from '../service/category';
-
 
 const HomeScreen = ({ navigation }) => {
- 
-  const [showSidebar, setShowSidebar] = useState(false);
-  const contentOffsetX = useRef(new Animated.Value(0)).current;
-  const contentOffsetY = useRef(new Animated.Value(0)).current;
-  const contentScale = useRef(new Animated.Value(1)).current;
-
- 
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const categories = ['Food', 'Drink', 'Snack', 'Sauce'];
   const [selectedCategory, setSelectedCategory] = useState(null);
-  
 
-  const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
+  const categories = ['Food', 'Drink', 'Snack', 'Sauce'];
 
-    Animated.parallel([
-      Animated.timing(contentScale, {
-        toValue: showSidebar ? 1 : 0.88,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentOffsetX, {
-        toValue: showSidebar ? 0 : 230,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentOffsetY, {
-        toValue: showSidebar ? 0 : 50,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  const renderButton = (category) => {
+    const isSelected = selectedCategory === category;
+
+    return (
+      <TouchableOpacity
+        onPress={() => setSelectedCategory(category)}
+      >
+        <Text style={{ color: isSelected ? '#FA4A0C' : '#ADADAF', fontSize: 18, marginLeft: 20 }}>{category}</Text>
+      </TouchableOpacity>
+    );
   };
 
-  
+  useEffect(() => {
+    getItemsByCategory(selectedCategory)
+      .then((items) => {
+        setData(items);
+      })
+      .catch((error) => {
+        console.error('Lỗi khi tải dữ liệu từ API: ', error);
+      });
+  }, [selectedCategory]);
 
   const goToSearchScreen = () => {
     navigation.navigate("Search");
@@ -53,51 +41,16 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Cart');
   };
 
-  useEffect(() => {
-    // Get the list of categories
-    getCategoryList()
-      .then((categories) => {
-        setData(categories);
-      })
-      .catch((error) => console.error(error));
-  }, []);
-  
-  useEffect(() => {
-    if (selectedCategory) {
-      // Get items for the selected category
-      getCategoryItems(selectedCategory)
-        .then((items) => {
-          setFilteredData(items);
-        })
-        .catch((error) => console.error(error));
-    } else {
-      // If no category is selected, show all data
-      setFilteredData(data);
-    }
-  }, [selectedCategory, data]);
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View
-        style={[
-          styles.contentContainer,
-          {
-            transform: [
-              { translateX: contentOffsetX },
-              { translateY: contentOffsetY },
-              { scale: contentScale },
-            ],
-          },
-        ]}
-      >
-        <View style={styles.content}>
-          <View style={styles.appBarContainer}>
+      <View style={styles.content}>
+        <View style={styles.appBarContainer}>
           <AppBar
             style={{ backgroundColor: 'transparent', elevation: 0, marginTop: 20 }}
             leading={props => (
               <IconButton
                 icon={props => <Icon name="menu" {...props} />}
                 color="#000"
-                onPress={toggleSidebar}
               />
             )}
             trailing={props => (
@@ -108,13 +61,14 @@ const HomeScreen = ({ navigation }) => {
               />
             )}
           />
-          </View>
-          <View style={styles.deliciousFoodContainer}>
-            <Text style={styles.text}>Delicious </Text>
-            <Text style={styles.text}>Food For You</Text>
-          </View>
+        </View>
 
-          <View style={styles.searchContainer}>
+        <View style={styles.deliciousFoodContainer}>
+          <Text style={styles.text}>Delicious </Text>
+          <Text style={styles.text}>Food For You</Text>
+        </View>
+
+        <View style={styles.searchContainer}>
           <TouchableOpacity style={styles.Search} onPress={goToSearchScreen}>
             <IconButton
               icon={props => <Icon name="magnify" {...props} />}
@@ -122,67 +76,36 @@ const HomeScreen = ({ navigation }) => {
             />
             <Text style={styles.textSearch}>Search</Text>
           </TouchableOpacity>
-          </View>
+        </View>
 
-        
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginLeft:70 , flex: 1 }}>
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category}
-            onPress={() => setSelectedCategory(category)}
-            style={{
-              padding: 8,
-            }}
-          >
-           <Text style={{ color: selectedCategory === category ? '#FA4A0C' : '#ADADAF', fontSize: 20, marginLeft: 20, }}>
-        {category}
-      </Text>
-          </TouchableOpacity>
-        ))}
-        </ScrollView>
-       <View style={styles.Cardcontainer}>
-      <FlatList
-      horizontal={true} // Sắp xếp ngang thay vì dọc
-        data={filteredData}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Detail', { foodId: item.id })}>
-          <Card  >
-           <Card.Cover source={{ uri: item.avatarUrl }} style={styles.cover} />
-            <Card.Content>
-              <Text style={styles.foodName}>{item.name}</Text>
-              <Text style={styles.foodPrice}>Price: {item.price} $</Text>
-            </Card.Content>
-          </Card>
-          </TouchableOpacity>
-        )}
-      />
+        <View style={styles.buttonContainer}>
+          {categories.map((category) => (
+            renderButton(category)
+          ))}
+        </View>
+
+        <FlatList
+          horizontal={true}
+          data={data}
+          keyExtractor={(item) => item.itemId.toString()}
+          renderItem={({ item }) => ( 
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Detail', { itemId: item.itemId })}>
+              <Card>
+                <Card.Cover source={{ uri: item.imageUrl }} style={styles.cover} />
+                <Card.Content>
+                  <Text style={styles.foodName}>{item.itemName}</Text>
+                  <Text style={styles.foodPrice}>Price: {item.cost} </Text>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+          )}
+        />
       </View>
-        </View>
-      </Animated.View>
-      {showSidebar && (
-        <View style={styles.sidebar}>
-          <TouchableOpacity style={styles.sidebarItem}>
-            <Icon name="account" size={24} color="white" style={styles.sidebarIcon} />
-            <Text style={styles.sidebarText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sidebarItem}>
-            <Icon name="shopping" size={24} color="white" style={styles.sidebarIcon} />
-            <Text style={styles.sidebarText}>Order</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sidebarItem}>
-            <Icon name="security" size={24} color="white" style={styles.sidebarIcon} />
-            <Text style={styles.sidebarText}>Security</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sidebarItem}>
-            <Icon name="logout" size={24} color="white" style={styles.sidebarIcon} />
-            <Text style={styles.sidebarText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </SafeAreaView>
   );
 };
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -195,10 +118,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 15,
   },
-  contentContainer: {
-    flex: 1,
-    flexDirection: 'column', // Sắp xếp các phần theo cột
-  },
   text: {
     fontFamily: 'SF Pro Rounded',
     fontSize: 34,
@@ -207,63 +126,24 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 20,
   },
-  sidebar: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    width: 230,
-    backgroundColor: '#FA4A0C',
-    paddingVertical: 20,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  button: {
+    paddingVertical: 10,
     paddingHorizontal: 15,
-  },
-  sidebarItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    marginTop: 20,
-  },
-  sidebarIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
-  sidebarText: {
-    fontSize: 18,
-    color: 'white',
-    marginLeft: 10,
-  },
-  Search: {
-    backgroundColor: '#EFEEEE',
-    borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  textSearch: {
-    color: '#000',
-    marginLeft: 8,
-    fontWeight: 'bold',
-  },
-  list: {
-    flex: 1, // Chiếm 1 phần
+    borderRadius: 5,
   },
   deliciousFoodContainer: {
-    flex: 1, // Chiếm 2 phần
-  },
-  searchContainer: {
-    flex: 1, // Chiếm 1 phần
+    flex: 1,
   },
   appBarContainer: {
-    flex: 1, // Chiếm 1 phần
+    flex: 1,
   },
- 
-  Cardcontainer: {
-    flex: 4 , // Chiếm 4 phần
-   
+  searchContainer: {
+    flex: 1,
   },
   card: {
     flex: 1,
@@ -281,10 +161,9 @@ const styles = StyleSheet.create({
   cover: {
     flexDirection: 'row',
     justifyContent: 'center',
-   
   },
   foodName: {
-    height: 90,
+    height: 70,
     color: '#000',
     textAlign: 'center',
     fontSize: 18,
@@ -296,10 +175,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
+  Search: {
+    backgroundColor: '#EFEEEE',
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  textSearch: {
+    color: '#000',
+    marginLeft: 8,
+    fontWeight: 'bold',
+  },
 });
-
-export default HomeScreen;
-
-
-
-
