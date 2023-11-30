@@ -1,7 +1,7 @@
 // DetailHistoryScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
-import { getDetailHistory } from '../service/history';  
+import { View, Text, FlatList, Image, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
+import { confirmOrder, getDetailHistory } from '../service/history';  
 import { AppBar, IconButton } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -29,6 +29,20 @@ const DetailHistoryScreen = ({ route, navigation }) => {
   </View>
   );
 
+  const handleCompleteOrder = () => {
+    // Thực hiện xác nhận đơn hàng
+    confirmOrder(orderId)
+      .then(() => {
+        Alert.alert('Thông báo', 'Đơn hàng đã được xác nhận thành công');
+        // Bạn có thể thực hiện các hành động cần thiết sau khi xác nhận đơn hàng
+        // Ví dụ: làm mới dữ liệu, chuyển hướng trang, ...
+      })
+      .catch(error => {
+        console.error('Error confirming order:', error);
+        Alert.alert('Lỗi', 'Đã xảy ra lỗi khi xác nhận đơn hàng');
+      });
+  };
+  
   return (
     <View style={styles.container}>
         <AppBar 
@@ -54,10 +68,20 @@ const DetailHistoryScreen = ({ route, navigation }) => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderOrderItem}
           />
+
+         
         </View>
       ) : (
         <Text>Loading...</Text>
       )}
+       <View style={styles.bottomContainer}>
+          <TouchableOpacity
+          style={styles.addToCartButton}
+          onPress={handleCompleteOrder}
+        >
+          <Text style={styles.addToCartText}>Complete</Text>
+        </TouchableOpacity>
+          </View>
     </View>
   );
 };
@@ -104,6 +128,26 @@ const styles = StyleSheet.create({
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  addToCartButton: {
+    backgroundColor: '#FA4A0C',
+    borderRadius: 30,
+    width: '80%',
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addToCartText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  bottomContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 16,
   },
 });
 

@@ -27,7 +27,7 @@ const FavoriteScreen: React.FC = () => {
       {favorites.map(item => (
         <> 
         <View style={styles.cardContent}>
-        {/* <Image source={{ uri: item.imageUrl }} style={styles.foodImage} /> */}
+        <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
         <View style={styles.textContainer}>
           <Text style={styles.foodName}>{item.itemName}</Text>
           <View style={styles.quantityContainer}>
@@ -49,6 +49,11 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 30,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginRight:30,
+    marginBottom: 20,
   },
   foodImage: {
     

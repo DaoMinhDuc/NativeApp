@@ -89,7 +89,7 @@ const SignUpScreen = ({ navigation }) => {
           <IconButton icon={props => <Icon name="chevron-left" {...props} />} {...props} color="#000" onPress={() => navigation.goBack()} />
         )}
       />
-      {/* <Text style={styles.header}>Đăng ký</Text> */}
+
       <TextInput
         placeholder="Tên"
         style={styles.input}
@@ -132,9 +132,11 @@ const SignUpScreen = ({ navigation }) => {
         <Text style={styles.errorText}>{confirmPasswordError}</Text>
       )}
 
+<View style={styles.buttonContainer}>
       <TouchableOpacity onPress={handleRegister} style={styles.button}>
         <Text style={styles.buttonText}>Đăng ký</Text>
       </TouchableOpacity>
+    </View>
     </View>
   );
 };
@@ -159,6 +161,12 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 8,
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   button: {
     backgroundColor: "#FA4A0C",

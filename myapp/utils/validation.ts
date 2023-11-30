@@ -20,8 +20,7 @@ export const validateEmail = (email: string): string | null => {
     return null;
   };
   export const validatePhoneNumber = (phoneNumber) => {
-    // Kiểm tra xem phoneNumber có hợp lệ theo quy tắc nào đó không, ví dụ:
-    const phoneNumberRegex = /^[0-9]{10}$/; // Đây là ví dụ regex kiểm tra xem phoneNumber có 10 chữ số hay không
+    const phoneNumberRegex = /^[0-9]{10}$/; //  kiểm tra xem phoneNumber có 10 chữ số hay không
     if (!phoneNumberRegex.test(phoneNumber)) {
       return "Số điện thoại phải có 10 chữ số.";
     }

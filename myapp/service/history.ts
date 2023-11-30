@@ -15,3 +15,11 @@ export const getDetailHistory = (orderId) => {
       throw error;
     });
 };
+export const confirmOrder = (orderId) => {
+  // Thực hiện POST để xác nhận đơn hàng
+  return axios.post(`${orderUrl}confirm?orderId=${orderId}`)
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+};

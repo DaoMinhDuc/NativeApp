@@ -23,6 +23,21 @@ const HistoryScreen = () => {
       });
   }, []); // Dependency array trống đảm bảo useEffect chỉ gọi một lần khi component được tạo
 
+
+  useEffect(() => {
+    // Gọi API khi component được tạo
+    fetchOrderData();
+  }, []); // Dependency array trống đảm bảo useEffect chỉ gọi một lần khi component được tạo
+
+  // Sử dụng useEffect để tự động reload sau mỗi khoảng thời gian
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setLoading(true);
+      fetchOrderData();
+    }, 10000); // Tự động reload sau mỗi 10 giây
+
+    return () => clearInterval(intervalId); // Clear interval khi component unmount
+  }, []);
   const renderOrderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleOrderPress(item.orderId)}>
       <View style={styles.orderItem}>

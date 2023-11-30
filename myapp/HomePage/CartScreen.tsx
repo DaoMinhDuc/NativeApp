@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { AppBar, IconButton } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { Swipeable } from 'react-native-gesture-handler';
@@ -56,8 +56,8 @@ const deleteItem = async (itemId) => {
         // ...
       });
 
-      console.log('Đơn hàng đã được đặt thành công!');
-      navigation.navigate('CheckOut');
+      Alert.alert('Đơn hàng đã được đặt thành công!');
+
     } catch (error) {
       console.error('Error placing order:', error);
     }
