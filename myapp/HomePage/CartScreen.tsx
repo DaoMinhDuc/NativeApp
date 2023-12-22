@@ -14,11 +14,8 @@ const CartScreen = ({ navigation }) => {
     const fetchCartItems = async () => {
       try {
         const items = await getCartItems();
-        console.log(items)
         setCartItems(items);
       } catch (error) {
-
-        // Handle error
         console.error('Error fetching cart items:', error);
       }
     };
@@ -28,12 +25,12 @@ const CartScreen = ({ navigation }) => {
 
 const deleteItem = async (itemId) => {
   try {
-    await removeFromCart(itemId);
+    await removeFromCart({ itemId });
     const updatedCartItems = cartItems.filter((item) => item.itemId !== itemId);
     setCartItems(updatedCartItems);
   } catch (error) {
-    console.error('Lỗi khi xóa sản phẩm từ giỏ hàng: ', error);
-    console.log(error.response)
+    Alert.alert('Lỗi khi xóa sản phẩm từ giỏ hàng: ');
+   
   }
 };
 
@@ -74,7 +71,7 @@ const deleteItem = async (itemId) => {
             </View>
             <View style={styles.iconContainer}>
               <TouchableOpacity
-                onPress={() => deleteItem(item.itemId)}
+                 onPress={() => deleteItem(item.itemId)}
                 style={{ backgroundColor: 'red', borderRadius: 30, padding: 10 }}
               >
                 <Icon name="trash-can-outline" size={25} color="white" />
