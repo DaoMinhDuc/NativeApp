@@ -8,47 +8,47 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 const HistoryScreen = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Gọi API khi component được tạo
-    fetchOrderData()
-      .then(data => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchOrderData(refresh);
         setOrders(data);
-        setLoading(false); // Đã nhận dữ liệu, ẩn loading
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setLoading(false); // Xảy ra lỗi, ẩn loading
-      });
-  }, []); // Dependency array trống đảm bảo useEffect chỉ gọi một lần khi component được tạo
+        setLoading(false);
+      } catch (error) {
+        console.error('Lỗi:', error);
+        setLoading(false);
+      }
+    };
 
+    fetchData();
+  }, [refresh]);
 
-  useEffect(() => {
-    // Gọi API khi component được tạo
-    fetchOrderData();
-  }, []); // Dependency array trống đảm bảo useEffect chỉ gọi một lần khi component được tạo
-
-  // Sử dụng useEffect để tự động reload sau mỗi khoảng thời gian
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLoading(true);
-      fetchOrderData();
-    }, 10000); // Tự động reload sau mỗi 10 giây
+      setRefresh(prevRefresh => !prevRefresh);
+    }, 10000);
 
-    return () => clearInterval(intervalId); // Clear interval khi component unmount
+    return () => clearInterval(intervalId);
   }, []);
+
   const renderOrderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleOrderPress(item.orderId)}>
+   
       <View style={styles.orderItem}>
         <Text>{`${item.orderStatus}`}</Text>
         <Text>{`${item.orderDate}`}</Text>
-      </View>
+        <TouchableOpacity 
+      style={styles.detailsButton}
+      onPress={() => handleOrderPress(item.orderId)}
+    >
+      <Text style={styles.detailsButtonText}>Xem chi tiết</Text>
     </TouchableOpacity>
+      </View>
   );
 
   const handleOrderPress = (orderId) => {
-    // Chuyển sang màn hình DetailHistoryScreen và truyền orderId
     navigation.navigate('DetailHistory', { orderId });
   };
   
@@ -68,14 +68,13 @@ const HistoryScreen = () => {
         )}
       />
       {loading ? (
-        // Hiển thị loading khi đang tải dữ liệu
         <ActivityIndicator size="large" color="#000" style={styles.loadingIndicator} />
       ) : (
-        // Hiển thị dữ liệu sau khi tải xong
         <FlatList
-          data={orders}
+        data={orders.reverse()}
           keyExtractor={(item) => item.orderId.toString()}
           renderItem={renderOrderItem}
+     
         />
       )}
     </View>
@@ -96,6 +95,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  detailsButton: {
+    width: '50%',
+    backgroundColor: '#FA4A0C',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 8,
+    marginLeft: 150,
+    alignItems: 'center',
+  },
+  detailsButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

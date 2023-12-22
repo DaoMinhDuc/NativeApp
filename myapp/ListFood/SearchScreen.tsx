@@ -7,9 +7,9 @@ import { Item } from '../interface/Search';
 const SearchScreen = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
-    // Gọi hàm lấy dữ liệu từ API khi component được tạo
     fetchData();
   }, []);
 
@@ -17,23 +17,23 @@ const SearchScreen = ({ navigation }) => {
     try {
       const result = await getAllItemApi();
       setData(result);
+      setFilteredData(result);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
-  const handleSearch = () => {
-    // Thực hiện tìm kiếm dựa trên searchQuery
+  const handleSearch = (text) => {
+    setSearchQuery(text);
     const filteredData = data.filter(item =>
-      item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+      item.itemName.toLowerCase().includes(text.toLowerCase())
     );
-    // Cập nhật dữ liệu sau khi tìm kiếm
-    setData(filteredData);
+    setFilteredData(filteredData);
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity  onPress={() => navigation.navigate('Detail', { itemId: item.itemId })}>
-        <View style={styles.cardContent}>
+    <TouchableOpacity onPress={() => navigation.navigate('Detail', { itemId: item.itemId })}>
+      <View style={styles.cardContent}>
         <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
         <View style={styles.textContainer}>
           <Text style={styles.foodName}>{item.itemName}</Text>
@@ -41,30 +41,28 @@ const SearchScreen = ({ navigation }) => {
             <View style={{ width: '60%' }}>
               <Text style={styles.foodPrice}>Giá: {item.cost}</Text>
             </View>
-            </View>
-            </View>
-            </View>
+          </View>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaView>
-     
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Nhập từ khóa tìm kiếm"
-          onChangeText={text => setSearchQuery(text)}
+          onChangeText={handleSearch}
           value={searchQuery}
         />
-        <Button title="Tìm kiếm" onPress={handleSearch} />
+       
       </View>
       <FlatList
-        data={data}
+        data={filteredData}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
       />
-    
     </SafeAreaView>
   );
 };
@@ -78,10 +76,12 @@ const styles = StyleSheet.create({
     height: 80,
   },
   input: {
-    width: '80%',
+   marginLeft: 20,
+    width: '90%',
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 5,
+    alignItems: 'center',
   },
   itemContainer: {
     borderBottomWidth: 1,

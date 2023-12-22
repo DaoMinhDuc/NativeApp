@@ -10,6 +10,9 @@ import { loginApi } from "../service/user";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
 
   const checkLoginStatus = async () => {
     try {
@@ -28,15 +31,36 @@ const LoginScreen = ({ navigation }) => {
   }, []);
 
   const handleLogin = async () => {
+    // Đặt lại thông báo lỗi trước mỗi lần kiểm tra đăng nhập
+    setEmailError("");
+    setPasswordError("");
+  
+    // Kiểm tra đầu vào và hiển thị thông báo lỗi nếu cần thiết
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+  
+    if (!password) {
+      setPasswordError("Password is required");
+      return;
+    }
+  
     // Gửi yêu cầu đăng nhập đến API
-    const response = await loginApi({ email, password });
-    const { data } = response.data;
-    const result = setAccessToken(response.data.token);
-    if (result) {
-      addTokenToAxios(response.data.token);
-      navigation.navigate("HomeTabs");
-    } else {
-      Alert.alert("Login Failed", "An error occurred during login. Please try again.");
+    try {
+      const response = await loginApi({ email, password });
+      const { data } = response.data;
+      const result = setAccessToken(response.data.token);
+  
+      if (result) {
+        addTokenToAxios(response.data.token);
+        navigation.navigate("HomeTabs");
+      } else {
+        Alert.alert("Đăng Nhập Thất Bại", "Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      // Xử lý lỗi xác thực từ máy chủ
+      Alert.alert("Đăng Nhập Thất Bại", "Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
     }
   };
 
@@ -62,25 +86,29 @@ const LoginScreen = ({ navigation }) => {
       <View>
       </View>
       <View style={{ flex: 0.45 }}>
-        <View style={styles.login}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email address"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            onChangeText={(text) => setEmail(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={(text) => setPassword(text)}
-          />
-          <TouchableOpacity style={styles.forgotPasswordButton}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+  <View style={styles.login}>
+    <TextInput
+      style={styles.input}
+      placeholder="Email address"
+      keyboardType="email-address"
+      autoCapitalize="none"
+      onChangeText={(text) => setEmail(text)}
+    />
+    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+
+    <TextInput
+      style={styles.input}
+      placeholder="Password"
+      secureTextEntry
+      onChangeText={(text) => setPassword(text)}
+    />
+    {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
+    <TouchableOpacity style={styles.forgotPasswordButton}>
+      <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+    </TouchableOpacity>
+  </View>
+</View>
       <View style={{ flex: 0.15, alignItems: 'center' }}>
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
@@ -154,6 +182,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 10,
   },
 });
 

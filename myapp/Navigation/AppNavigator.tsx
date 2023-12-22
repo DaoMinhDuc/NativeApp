@@ -11,6 +11,7 @@ import SearchScreen from "../ListFood/SearchScreen";
 import DetailScreen from "../ListFood/DetailScreen";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import DetailHistoryScreen from "../HomePage/DetailHistoryScreen";
+import HistoryScreen from "../HomePage/HistoryScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,9 +28,9 @@ const AppNavigator = () => {
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="Detail" component={DetailScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
         <Stack.Screen name="HomeTabs" component={HomeTabNavigator} />
         <Stack.Screen name="DetailHistory" component={DetailHistoryScreen} />
-        {/* <Stack.Screen name="Sidebar" component={DrawerNavigator} /> */}
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>

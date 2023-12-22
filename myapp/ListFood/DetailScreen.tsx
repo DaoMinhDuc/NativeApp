@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { AppBar, HStack, IconButton, Stack, TextInput } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
@@ -104,7 +104,11 @@ const DetailScreen= ({ navigation }) => {
       {/* Nút Add to cart */}
       <TouchableOpacity 
         style={[styles.addToCartButton ,{ marginRight: 10 }]}
-        onPress={handleAddToCart}
+        onPress={() => {
+          handleAddToCart();
+          Alert.alert('Thông báo', 'Đã thêm vào giỏ hàng thành công');
+        }}
+        
       >
         <Text style={styles.addToCartText }>Add to Cart</Text>
       </TouchableOpacity>

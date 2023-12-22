@@ -14,8 +14,10 @@ const CartScreen = ({ navigation }) => {
     const fetchCartItems = async () => {
       try {
         const items = await getCartItems();
+        console.log(items)
         setCartItems(items);
       } catch (error) {
+
         // Handle error
         console.error('Error fetching cart items:', error);
       }
@@ -31,6 +33,7 @@ const deleteItem = async (itemId) => {
     setCartItems(updatedCartItems);
   } catch (error) {
     console.error('Lỗi khi xóa sản phẩm từ giỏ hàng: ', error);
+    console.log(error.response)
   }
 };
 
@@ -52,12 +55,11 @@ const deleteItem = async (itemId) => {
       // Gửi thông tin đơn hàng đến server
       await placeOrder({
         items: cartItems.map(item => ({ itemId: item.itemId, quantity: item.quantity })),
-        // Thêm các thông tin khác cần thiết cho đơn hàng
-        // ...
+      
       });
 
       Alert.alert('Đơn hàng đã được đặt thành công!');
-
+      navigation.navigate('History');
     } catch (error) {
       console.error('Error placing order:', error);
     }
@@ -69,12 +71,6 @@ const deleteItem = async (itemId) => {
         renderRightActions={(_, dragX) => (
           <View style={{ flexDirection: 'row' }}>
             <View style={styles.iconContainer}>
-              <TouchableOpacity
-                onPress={() => handleSwipeLeft(index)}
-                style={{ backgroundColor: 'red', borderRadius: 30, padding: 10 }}
-              >
-                <Icon name="heart-outline" size={25} color="white" />
-              </TouchableOpacity>
             </View>
             <View style={styles.iconContainer}>
               <TouchableOpacity
@@ -113,13 +109,6 @@ const deleteItem = async (itemId) => {
     );
   };
 
-  const handleSwipeLeft = (index) => {
-    setIsSwiped((prevState) => {
-      const newState = [...prevState];
-      newState[index] = true;
-      return newState;
-    });
-  };
 
   return (
     <View style={styles.container}>
@@ -145,6 +134,7 @@ const deleteItem = async (itemId) => {
       </View>
      
         <View style={{ flex: 7 }}>
+          <Text style={{textAlign: 'center', marginTop: 10, marginBottom: 10}}>trượt sang trái để xóa</Text>
          <FlatList
           data={cartItems}
           renderItem={renderCartItem}

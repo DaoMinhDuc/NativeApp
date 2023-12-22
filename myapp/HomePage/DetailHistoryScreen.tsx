@@ -11,8 +11,10 @@ const DetailHistoryScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getDetailHistory(orderId)
+    
       .then(data => setDetailHistory(data))
       .catch(error => console.error('Error:', error));
+
   }, [orderId]);
 
   const renderOrderItem = ({ item }) => (

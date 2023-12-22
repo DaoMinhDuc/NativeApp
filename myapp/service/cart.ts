@@ -24,7 +24,7 @@ export const getCartItems = async () => {
 };
 
 // Hàm xóa một sản phẩm khỏi giỏ hàng
-export const removeFromCart = async (itemId) => {
+export const removeFromCart = async ({itemId}) => {
   try {
     await axios.delete(`${cartUrl}/remove-item?itemId=${itemId}`);
     console.log('Đã xóa sản phẩm khỏi giỏ hàng');
@@ -43,4 +43,4 @@ export const placeOrder = async (orderDetails) => {
     throw error;
   }
 };
-// const cartUrl = 'https://6528e224931d71583df28880.mockapi.io/Cart';
+
